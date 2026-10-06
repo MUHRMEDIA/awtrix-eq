@@ -26,7 +26,9 @@ Ruhe-Animation wenn keine Musik läuft, Autostart beim Anmelden.
 
 ## Installation
 
-1. ZIP entpacken, zum Beispiel in den Downloads-Ordner.
+1. Paket laden: [awtrix-eq als ZIP](https://github.com/MUHRMEDIA/awtrix-eq/archive/refs/heads/main.zip),
+   entpacken, zum Beispiel in den Downloads-Ordner. Der Ordner heißt dann `awtrix-eq-main`;
+   in den Befehlen unten entsprechend `awtrix-eq-main` statt `awtrix-eq` schreiben.
 2. Terminal öffnen (Programme → Dienstprogramme → Terminal).
 3. Eingeben, dabei den Pfad anpassen:
 
