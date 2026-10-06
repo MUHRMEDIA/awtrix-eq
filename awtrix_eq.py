@@ -337,6 +337,7 @@ def main():
                     help="average bar movement (pixels per frame) below which the input counts as silent (0 = no idle animation)")
     ap.add_argument("--idle-after", type=float, default=15.0, help="seconds of silence before the idle animation starts")
     ap.add_argument("--clock", default=CLOCK)
+    ap.add_argument("--channel", type=int, default=1, help="channel of the input device, 1 = first (RODECaster multitrack: 1/2 = main mix)")
     ap.add_argument("--app", default=APP, help="app name on the clock (e.g. eq_v1 and eq_v2 to run two displays side by side)")
     ap.add_argument("--list", action="store_true")
     ap.add_argument("--demo", action="store_true", help="test pattern without audio")
@@ -411,14 +412,18 @@ def main():
     latest = {"buf": None, "ring": ring}
 
     def cb(indata, frames, t, status):
-        mono = indata[:, 0].copy()
+        mono = indata[:, chan - 1].copy()
         latest["buf"] = mono
         latest["ring"] = np.concatenate((latest["ring"][len(mono):], mono))
 
     quiet_since = None      # moment since which the input has been quiet
     idle = False
 
-    with sd.InputStream(device=dev, channels=1, samplerate=RATE, blocksize=BLOCK, callback=cb):
+    chan = max(1, a.channel)
+    maxch = int(sd.query_devices(dev)["max_input_channels"])
+    if chan > maxch:
+        print(f"Kanal {chan} gibt es nicht, das Geraet hat {maxch}" if "en" == "de" else f"channel {chan} does not exist, the device has {maxch}", file=sys.stderr); sys.exit(1)
+    with sd.InputStream(device=dev, channels=chan, samplerate=RATE, blocksize=BLOCK, callback=cb):
         try:
             rms_db = -99.0
             peak_px = 0.0

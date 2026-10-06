@@ -64,6 +64,7 @@ All values live in `~/Library/Application Support/awtrix-eq/config.json`:
 | `gain` | sensitivity, higher = taller bars | `1.5` |
 | `tilt` | treble boost in dB per octave, 0 = flat | `4.5` |
 | `fps` | target frame rate | `42` |
+| `channel` | channel of the audio device, 1 = first (RODECaster multitrack: 1 or 2 = main mix) | `1` |
 | `connections` | parallel connections to the clock | `3` |
 | `idle_after` | seconds without music before the idle animation | `15` |
 
