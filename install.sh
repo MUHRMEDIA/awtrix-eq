@@ -1,12 +1,12 @@
 #!/bin/bash
-# AWTRIX EQ - Installer fuer macOS
-# Legt eine eigene Python-Umgebung an, fragt Uhr-IP, Tonquelle und Stil ab,
-# schreibt die Konfiguration und richtet den Autostart beim Anmelden ein.
+# AWTRIX EQ - installer for macOS
+# Creates a private Python environment, asks for the clock's IP, the audio source and the style,
+# writes the configuration and sets up automatic start at login.
 #
-# Aufruf:   bash install.sh
-# Ohne Rueckfragen (z.B. fuer Tests):
-#   AWTRIX_EQ_IP=192.168.1.154 AWTRIX_EQ_DEVICE="eqMac" AWTRIX_EQ_STYLE=v2 bash install.sh
-#   AWTRIX_EQ_NO_AUTOSTART=1   -> keinen Autostart einrichten
+# Usage:   bash install.sh
+# Without prompts (e.g. for testing):
+#   AWTRIX_EQ_IP=192.168.1.154 AWTRIX_EQ_DEVICE="BlackHole" AWTRIX_EQ_STYLE=v2 bash install.sh
+#   AWTRIX_EQ_NO_AUTOSTART=1   -> do not set up autostart
 set -e
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -16,61 +16,61 @@ CONFIG="$APP_DIR/config.json"
 LABEL="de.awtrix-eq.analyzer"
 PLIST="$HOME/Library/LaunchAgents/$LABEL.plist"
 
-echo "AWTRIX EQ Installation"
+echo "AWTRIX EQ installation"
 echo "----------------------"
 
-# 1. Python pruefen
+# 1. Python
 PY=$(command -v python3 || true)
 if [ -z "$PY" ]; then
-  echo "python3 fehlt. Bitte installieren (https://www.python.org oder 'xcode-select --install') und erneut starten."; exit 1
+  echo "python3 is missing. Install it (https://www.python.org or 'xcode-select --install') and run this again."; exit 1
 fi
 PYV=$($PY -c 'import sys; print("%d.%d" % sys.version_info[:2])')
-echo "Python $PYV gefunden: $PY"
+echo "Found Python $PYV: $PY"
 
-# 2. Umgebung und Abhaengigkeiten
+# 2. Environment and dependencies
 mkdir -p "$APP_DIR"
 if [ ! -x "$VENV/bin/python" ]; then
-  echo "Lege Python-Umgebung an ..."
+  echo "Creating Python environment ..."
   "$PY" -m venv "$VENV"
 fi
-echo "Installiere Abhaengigkeiten (numpy, sounddevice) ..."
+echo "Installing dependencies (numpy, sounddevice) ..."
 "$VENV/bin/pip" install --quiet --upgrade pip >/dev/null
 "$VENV/bin/pip" install --quiet -r "$HERE/requirements.txt"
 cp "$HERE/awtrix_eq.py" "$APP_DIR/awtrix_eq.py"
 
-# 3. Uhr-IP
+# 3. Clock IP
 IP="${AWTRIX_EQ_IP:-}"
 if [ -z "$IP" ]; then
-  read -r -p "IP-Adresse der Uhr (steht in der AWTRIX Web-UI unter System): " IP
+  read -r -p "IP address of the clock (shown in the AWTRIX web UI under System): " IP
 fi
 if curl -s -m 4 "http://$IP/api/v1/version" | grep -q version; then
-  echo "Uhr gefunden: $(curl -s -m 4 "http://$IP/api/v1/version")"
+  echo "Clock found: $(curl -s -m 4 "http://$IP/api/v1/version")"
 else
-  echo "Warnung: Unter $IP antwortet keine AWTRIX-Uhr. Installation geht weiter, bitte IP spaeter in $CONFIG pruefen."
+  echo "Warning: no AWTRIX clock answers at $IP. Continuing; please check the IP later in $CONFIG."
 fi
 
-# 4. Tonquelle
+# 4. Audio source
 echo
-echo "Verfuegbare Tonquellen:"
+echo "Available audio sources:"
 "$VENV/bin/python" "$APP_DIR/awtrix_eq.py" --list || true
 echo
-echo "Tipp: Fuer Musik vom Mac ein virtuelles Ausgabegeraet nehmen (BlackHole oder eqMac)."
-echo "      Ein Mikrofon zeigt stattdessen den Raumschall."
+echo "Tip: to visualise music from the Mac, pick a virtual output device (BlackHole or eqMac)."
+echo "     A microphone shows the sound in the room instead."
 DEVICE="${AWTRIX_EQ_DEVICE:-}"
 if [ -z "$DEVICE" ]; then
-  read -r -p "Tonquelle (Namensteil oder Nummer): " DEVICE
+  read -r -p "Audio source (part of the name or the number): " DEVICE
 fi
 
-# 5. Stil
+# 5. Style
 STYLE="${AWTRIX_EQ_STYLE:-}"
 if [ -z "$STYLE" ]; then
   echo
-  echo "Darstellung:  v2 = Kurve mit Mittelwertlinie (empfohlen)   v1 = 52 weisse Balken"
-  read -r -p "Stil [v2]: " STYLE
+  echo "Style:  v2 = curve with average line (recommended)   v1 = 52 white bars"
+  read -r -p "Style [v2]: " STYLE
   STYLE="${STYLE:-v2}"
 fi
 
-# 6. Konfiguration schreiben
+# 6. Write configuration
 cat > "$CONFIG" <<EOF
 {
   "clock": "$IP",
@@ -83,7 +83,7 @@ cat > "$CONFIG" <<EOF
   "idle_after": 15
 }
 EOF
-echo "Konfiguration gespeichert: $CONFIG"
+echo "Configuration saved: $CONFIG"
 
 # 7. Autostart
 if [ -z "${AWTRIX_EQ_NO_AUTOSTART:-}" ]; then
@@ -106,14 +106,14 @@ if [ -z "${AWTRIX_EQ_NO_AUTOSTART:-}" ]; then
 EOF
   launchctl bootout "gui/$(id -u)/$LABEL" >/dev/null 2>&1 || true
   launchctl bootstrap "gui/$(id -u)" "$PLIST"
-  echo "Autostart eingerichtet und gestartet. Beim ersten Start fragt macOS einmal nach Mikrofon-Zugriff: bitte erlauben."
-  echo "Protokoll: $APP_DIR/awtrix-eq.log"
+  echo "Autostart set up and started. On first start macOS asks once for microphone access: please allow it."
+  echo "Log: $APP_DIR/awtrix-eq.log"
 else
-  echo "Autostart uebersprungen. Manuell starten mit:"
+  echo "Autostart skipped. Start manually with:"
   echo "  \"$VENV/bin/python\" \"$APP_DIR/awtrix_eq.py\""
 fi
 
 echo
-echo "Fertig. Einstellungen aendern: $CONFIG bearbeiten, dann:"
+echo "Done. To change settings edit $CONFIG, then run:"
 echo "  launchctl kickstart -k gui/$(id -u)/$LABEL"
-echo "Deinstallieren: bash uninstall.sh"
+echo "To uninstall: bash uninstall.sh"

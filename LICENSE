@@ -1,13 +1,9 @@
 AWTRIX EQ
-Copyright (c) 2026 Max Muhr. Alle Rechte vorbehalten. / All rights reserved.
-
-Diese Software wird zur persoenlichen Nutzung auf eigenen Geraeten bereitgestellt.
-Weitergabe, Verkauf oder Veroeffentlichung veraenderter Fassungen bedarf der
-schriftlichen Zustimmung des Autors.
+Copyright (c) 2026 Max Muhr. All rights reserved.
 
 This software is provided for personal use on your own devices. Redistribution,
 resale or publication of modified versions requires the author's written consent.
 
-Hinweis: AWTRIX NG (Blueforcer) und der TC002-Port (sanderdw) sind eigenstaendige
-Projekte unter der PolyForm Noncommercial 1.0.0. AWTRIX EQ enthaelt keinen Code
-dieser Projekte und nutzt ausschliesslich deren oeffentliche HTTP-Schnittstelle.
+Note: AWTRIX NG (Blueforcer) and the TC002 port (sanderdw) are independent projects
+licensed under PolyForm Noncommercial 1.0.0. AWTRIX EQ contains no code from these
+projects and only uses their public HTTP API.
