@@ -37,7 +37,10 @@ an idle animation when no music is playing, and automatic start at login.
    - the clock's IP address,
    - the audio source (it lists the devices; part of a name such as `BlackHole` or `eqMac` is enough),
    - the style: `v2` curve with average line (recommended) or `v1` 52 white bars.
-5. On first start macOS asks for microphone access. Allow it; this also applies to virtual audio devices.
+5. On first start macOS asks for microphone access and for local network access
+   ("Python wants to find and connect to devices on your local network"). Allow both.
+   If you missed the prompt and the clock stays dark, open System Settings → Privacy & Security →
+   Local Network and switch on **Python**, then the program reconnects by itself.
 
 AWTRIX EQ then runs in the background and starts automatically at every login.
 The clock shows an app called `spectrum`; it disappears when the Mac is off.

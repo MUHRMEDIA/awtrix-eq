@@ -95,6 +95,7 @@ if [ -z "${AWTRIX_EQ_NO_AUTOSTART:-}" ]; then
   <key>Label</key><string>$LABEL</string>
   <key>ProgramArguments</key><array>
     <string>$VENV/bin/python</string>
+    <string>-u</string>
     <string>$APP_DIR/awtrix_eq.py</string>
   </array>
   <key>RunAtLoad</key><true/>
@@ -106,7 +107,9 @@ if [ -z "${AWTRIX_EQ_NO_AUTOSTART:-}" ]; then
 EOF
   launchctl bootout "gui/$(id -u)/$LABEL" >/dev/null 2>&1 || true
   launchctl bootstrap "gui/$(id -u)" "$PLIST"
-  echo "Autostart set up and started. On first start macOS asks once for microphone access: please allow it."
+  echo "Autostart set up and started."
+  echo "macOS will ask once for microphone access and once for local network access (\"Python wants to find devices\"): allow both."
+  echo "If the clock stays dark, open System Settings > Privacy & Security > Local Network and enable Python."
   echo "Log: $APP_DIR/awtrix-eq.log"
 else
   echo "Autostart skipped. Start manually with:"
